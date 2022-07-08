@@ -12,23 +12,47 @@ static ASCII_LUMINANCE_STR: &str =
     "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`\'. ";
 
 fn main() {
-    println!("Image path : ");
     //get input first
-    let mut s = String::new();
-    stdin().read_line(&mut s).expect("Please enter a file name");
+    let mut img;
 
-    //remove EoL characters
-    s = s.replace("\n", "").replace("\r", "");
+    loop {
+        let mut s = String::new();
+        println!("Image path : ");
+        stdin().read_line(&mut s).expect("Please enter a file name");
 
-    println!("scale: ");
+        //remove EoL characters
+        s = s.replace("\n", "").replace("\r", "");
+
+        match image::open(&s) {
+            Ok(r) => {
+                img = r;
+                break;
+            }
+            Err(e) => {
+                println!("{:?}", e);
+            }
+        }
+    }
 
     let scale;
-    let mut line = String::new();
-    stdin().read_line(&mut line).expect("Please enter a float");
-    scale = line.trim().parse().expect("Please enter a float");
 
-    //init image
-    let mut img = image::open(&s).unwrap();
+    loop {
+        println!("scale: ");
+
+        let mut line = String::new();
+        stdin().read_line(&mut line).expect("Please enter a float");
+
+        match line.trim().parse() {
+            Ok(s) => {
+                scale = s;
+                break;
+            }
+            Err(e) => {
+                println!("{:?}", e);
+            }
+        }
+    }
+
     img = image_scaler(&img, scale);
     image_ascii_convertor(&img);
 }
