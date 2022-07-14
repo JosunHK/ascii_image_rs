@@ -88,10 +88,19 @@ fn image_ascii_convertor(img: &DynamicImage) {
     }
 
     //write file
+    //WARMNING THIS PART IS UGLY AF
+    f.write_all("\"\\n\"+\n".as_bytes()).unwrap();
     for i in 0..width - 1 {
         let row = &canvas[i as usize];
         let mut s: String = row.into_iter().collect();
-        s += "\n";
+        s = s
+            .replace("\\", "\\\\")
+            .replace("\"", "\\\"")
+            .replace("\'", "\\\'");
+        s = "\"".to_owned() + &s + "\\n\"+\n";
+        if i == width - 2 {
+            s = s.replace("+", ";");
+        };
         f.write_all(s.as_bytes()).unwrap();
     }
 }
