@@ -4,7 +4,7 @@ use std::{
 };
 
 use image::{
-    imageops::{resize, FilterType},
+    imageops::FilterType,
     DynamicImage, GenericImageView,
 };
 
@@ -69,7 +69,7 @@ fn image_ascii_convertor(img: &DynamicImage) {
     std::fs::remove_file("output.txt").expect("File delete failed");
     let mut f = File::create("output.txt").unwrap();
 
-    //convert image to 2d array of geryscale
+    //convert image to 2d vector of geryscale
     for i in 0..width - 1 {
         for j in 0..height - 1 {
             let pixel = img.get_pixel(j, i);
@@ -87,9 +87,22 @@ fn image_ascii_convertor(img: &DynamicImage) {
         }
     }
 
+    let mut s = String::new();
+    println!("Generate for comment? (y/n)");
+    stdin().read_line(&mut s).expect("Please enter y / n");
+
     //write file
-    //WARMNING THIS PART IS UGLY AF
+    if s.trim() == "y"{ 
+        print_for_java_comment(f, width, canvas);
+    } else{
+        normal_print(f, width, canvas);
+    }
+}
+
+//yeah I know this fuction is ugly af
+fn print_for_java_comment(mut f:File, width:u32, canvas: Vec<Vec<char>>){
     f.write_all("\"\\n\"+\n".as_bytes()).unwrap();
+
     for i in 0..width - 1 {
         let row = &canvas[i as usize];
         let mut s: String = row.into_iter().collect();
@@ -101,6 +114,15 @@ fn image_ascii_convertor(img: &DynamicImage) {
         if i == width - 2 {
             s = s.replace("+", ";");
         };
+        f.write_all(s.as_bytes()).unwrap();
+    }
+}
+
+fn normal_print(mut f:File, width:u32, canvas: Vec<Vec<char>>){
+    for i in 0..width - 1 {
+        let row = &canvas[i as usize];
+        let mut s: String = row.into_iter().collect();
+        s += "\n";
         f.write_all(s.as_bytes()).unwrap();
     }
 }
